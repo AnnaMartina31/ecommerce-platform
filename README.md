@@ -1,5 +1,8 @@
 # E-commerce Distributed Platform
 
+![CI](https://github.com/AnnaMartina31/ecommerce-platform/actions/workflows/ci.yml/badge.svg)
+
+
 A microservices-based e-commerce backend built with Spring Boot, demonstrating distributed systems patterns: service-to-service communication, event-driven messaging, caching, observability, and performance testing under load.
 
 Built as a portfolio project to practice and demonstrate backend engineering beyond a single-service CRUD app.
