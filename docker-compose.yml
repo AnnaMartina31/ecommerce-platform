@@ -64,7 +64,7 @@ services:
       - kafka
 
   users-service:
-    build: ./users-service/users-service
+    build: ./users-service
     ports:
       - "8080:8080"
     environment:
@@ -75,7 +75,7 @@ services:
       - users-db
 
   products-service:
-    build: ./products-service/products-service
+    build: ./products-service
     ports:
       - "8081:8081"
     environment:
@@ -88,7 +88,7 @@ services:
       - redis
 
   orders-service:
-    build: ./orders-service/orders-service
+    build: ./orders-service
     ports:
       - "8082:8082"
     environment:
@@ -105,7 +105,7 @@ services:
       - kafka
 
   notifications-service:
-    build: ./notifications-service/notifications-service
+    build: ./notifications-service
     ports:
       - "8083:8083"
     environment:
