@@ -15,6 +15,8 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import com.anna.ecommerce.ordersservice.order.event.OrderEventPublisher;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -39,6 +41,9 @@ class OrderControllerIT {
 
     @MockitoBean
     private ProductClient productClient;
+
+    @MockitoBean
+    private OrderEventPublisher orderEventPublisher;
 
     @Test
     void createOrder_withValidUserAndProduct_returnsCreatedOrder() {

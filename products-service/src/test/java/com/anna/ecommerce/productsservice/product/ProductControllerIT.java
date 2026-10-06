@@ -15,6 +15,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.utility.DockerImageName;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -25,6 +27,11 @@ class ProductControllerIT {
     @ServiceConnection
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16");
 
+    @Container
+    @ServiceConnection(name = "redis")
+    static GenericContainer<?> redis =
+            new GenericContainer<>(DockerImageName.parse("redis:7")).withExposedPorts(6379);
+    
     @Autowired
     private TestRestTemplate restTemplate;
 
