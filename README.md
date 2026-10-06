@@ -87,6 +87,18 @@ Stress testing surfaced a real bottleneck: the default HikariCP connection pool 
 
 Full methodology, numbers, and root-cause analysis: **[RESULTS.md](./RESULTS.md)**
 
+## Transactional outbox
+
+`orders-service` must save an order and notify the rest of the system. Writing to Postgres and then publishing to Kafka are two separate operations (dual-write): if Kafka is down, or the app stops between the two, the order exists but the event is lost.
+
+To avoid this, the order and its event are saved in the **same database transaction**: the event goes into an `outbox_events` table. A scheduled relay (`OutboxRelay`) reads unpublished rows every second, sends them to Kafka and marks them as published. If Kafka is unreachable, events stay in the table and are retried.
+
+Verified by two integration tests (Testcontainers):
+- `OrderOutboxIT`: with Kafka down, the order is created (`201`) and the event stays pending.
+- `OrderOutboxRelayIT`: with Kafka up, the relay publishes the event and it appears on the `order-events` topic.
+
+**Trade-off:** delivery is *at-least-once*. If the relay publishes but crashes before marking the row, the event is sent twice, so consumers (e.g. `notifications-service`) must be idempotent.
+
 ## What's not (yet) included
 
 - Kubernetes deployment (the platform currently runs via Docker Compose only)
