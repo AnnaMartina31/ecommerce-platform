@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.Instant;
 import java.util.Map;
+import com.anna.ecommerce.ordersservice.order.client.DependencyUnavailableException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -31,6 +32,18 @@ public class GlobalExceptionHandler {
                         "timestamp", Instant.now().toString(),
                         "status", 409,
                         "error", "Conflict",
+                        "message", ex.getMessage()
+                ));
+    }
+
+    @ExceptionHandler(DependencyUnavailableException.class)
+    public ResponseEntity<Map<String, Object>> handleDependencyUnavailable(DependencyUnavailableException ex) {
+        return ResponseEntity
+                .status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(Map.of(
+                        "timestamp", Instant.now().toString(),
+                        "status", 503,
+                        "error", "Service Unavailable",
                         "message", ex.getMessage()
                 ));
     }
