@@ -104,14 +104,30 @@ services:
       - products-service
       - kafka
 
+  notifications-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: notifications
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+    ports:
+      - "5436:5432"
+    volumes:
+      - notifications-db-data:/var/lib/postgresql/data
+
   notifications-service:
     build: ./notifications-service
     ports:
       - "8083:8083"
     environment:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_DATASOURCE_URL: jdbc:postgresql://notifications-db:5432/notifications
+      SPRING_DATASOURCE_USERNAME: app
+      SPRING_DATASOURCE_PASSWORD: app
     depends_on:
       - kafka
+      - notifications-db
+
 
   api-gateway:
     build: ./api-gateway
@@ -147,3 +163,4 @@ volumes:
   users-db-data:
   products-db-data:
   orders-db-data:
+  notifications-db-data:

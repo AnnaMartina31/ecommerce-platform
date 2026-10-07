@@ -53,8 +53,7 @@ Each service owns its own PostgreSQL database (database-per-service pattern). `o
 - **Apache Kafka** (KRaft mode) — asynchronous order events; [Kafka UI](https://github.com/provectus/kafka-ui) included for inspecting topics
 - **Docker Compose** — full local environment, one command to run everything
 - **Prometheus + Grafana** — metrics collection and dashboards (via Micrometer / Actuator)
-- **k6** — load and stress testing, with root-cause analysis of a real bottleneck found under load (see [RESULTS.md](./RESULTS.md))
-
+- **k6** — load and stress testing, with root-cause analysis of a real bottleneck found under load (see [Performance testing](#performance-testing))
 ## Running it
 
 Requires Docker Desktop.
@@ -85,7 +84,7 @@ The [`k6-tests/`](./k6-tests) folder contains smoke, load, and stress test scrip
 
 Stress testing surfaced a real bottleneck: the default HikariCP connection pool (10 connections) saturated under concurrent order creation, causing request timeouts. The pool size was increased and the fix verified with a clean before/after benchmark comparison.
 
-Full methodology, numbers, and root-cause analysis: **[RESULTS.md](./RESULTS.md)**
+Full methodology [main](notifications-service/src/main)and numbers are in the sections above and in the scripts under `k6-tests/`.
 
 ## Transactional outbox
 
@@ -130,6 +129,5 @@ ecommerce-platform/
 ├── k6-tests/              # k6 load/stress test scripts
 ├── docker-compose.yml
 ├── prometheus.yml
-├── RESULTS.md             # performance testing report
 └── README.md
 ```
