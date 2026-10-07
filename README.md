@@ -99,6 +99,18 @@ Verified by two integration tests (Testcontainers):
 
 **Trade-off:** delivery is *at-least-once*. If the relay publishes but crashes before marking the row, the event is sent twice, so consumers (e.g. `notifications-service`) must be idempotent.
 
+## Resilience: circuit breaker and timeouts on orders-service
+
+**Scenario.** 10 virtual users create orders for 90 s through the gateway. At ~30 s `products-service` is stopped, at ~60 s it is restarted (`k6-tests/orders-resilience-test.js`). `orders-service` calls `products-service` synchronously.
+
+**Before** (no timeouts, no circuit breaker): 1030 orders created, **240 uncontrolled failures** (500s/timeouts), max latency 10 s (the k6 client timeout), avg 210 ms.
+
+**After** (connect 1 s / read 2 s timeouts + Resilience4j circuit breaker): 770 orders created, 858 clean `503 Service Unavailable`, **0 uncontrolled failures**, max latency 2.3 s, avg 44 ms. Once the circuit is open, 503s are returned in a median of 17 ms (p95 30 ms) without touching the network.
+
+**Reading the results.** k6 counts the intentional 503s as failed requests (`http_req_failed` 52.7%); the relevant signal is that every response was either 201 or a fast, explicit 503. Fewer 201s in the second run is expected: the circuit stays open while `products-service` restarts, and the two runs' stop/start timings were not identical, so the 201 counts are not directly comparable.
+
+**Limits.** Single run per variant, manual stop/start timing, local Docker environment.
+
 ## What's not (yet) included
 
 - Kubernetes deployment (the platform currently runs via Docker Compose only)
