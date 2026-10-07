@@ -98,6 +98,12 @@ Verified by two integration tests (Testcontainers):
 
 **Trade-off:** delivery is *at-least-once*. If the relay publishes but crashes before marking the row, the event is sent twice, so consumers (e.g. `notifications-service`) must be idempotent.
 
+## Idempotent consumer
+
+Because the outbox guarantees at-least-once delivery, `notifications-service` may receive the same event twice. It records each handled `orderId` in a `processed_events` table (primary key on `order_id`): the first insert succeeds and triggers the notification, a duplicate violates the key and is ignored. Together with the outbox this gives effectively-once processing. Covered by `OrderEventConsumerIT` (Testcontainers), which delivers the same event twice and asserts a single notification.
+
+**Limit:** the mark-as-processed insert and the notification are not atomic; if sending fails after the insert, the event is not retried.
+
 ## Resilience: circuit breaker and timeouts on orders-service
 
 **Scenario.** 10 virtual users create orders for 90 s through the gateway. At ~30 s `products-service` is stopped, at ~60 s it is restarted (`k6-tests/orders-resilience-test.js`). `orders-service` calls `products-service` synchronously.
