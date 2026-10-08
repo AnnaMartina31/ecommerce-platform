@@ -17,12 +17,13 @@ public class UserClient {
     private final RestClient restClient;
     private final CircuitBreaker circuitBreaker;
 
-    public UserClient(@Value("${users.service.url}") String usersServiceUrl) {
+    public UserClient(RestClient.Builder builder,
+                      @Value("${users.service.url}") String usersServiceUrl) {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         factory.setConnectTimeout(Duration.ofSeconds(1));
         factory.setReadTimeout(Duration.ofSeconds(2));
 
-        this.restClient = RestClient.builder()
+        this.restClient = builder
                 .baseUrl(usersServiceUrl)
                 .requestFactory(factory)
                 .build();

@@ -19,12 +19,13 @@ public class ProductClient {
     private final RestClient restClient;
     private final CircuitBreaker circuitBreaker;
 
-    public ProductClient(@Value("${products.service.url}") String productsServiceUrl) {
+    public ProductClient(RestClient.Builder builder,
+                         @Value("${products.service.url}") String productsServiceUrl) {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         factory.setConnectTimeout(Duration.ofSeconds(1));
         factory.setReadTimeout(Duration.ofSeconds(2));
 
-        this.restClient = RestClient.builder()
+        this.restClient = builder
                 .baseUrl(productsServiceUrl)
                 .requestFactory(factory)
                 .build();

@@ -7,8 +7,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ProductClientCircuitBreakerTest {
 
-    // Porta su cui non ascolta nessuno: la connessione viene rifiutata subito.
-    private final ProductClient client = new ProductClient("http://localhost:1");
+    private final ProductClient client =
+            new ProductClient(org.springframework.web.client.RestClient.builder(), "http://localhost:1");
 
     @Test
     void whenServiceIsDown_circuitOpensAndLaterCallsFailFast() {

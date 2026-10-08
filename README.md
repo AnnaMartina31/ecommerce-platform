@@ -116,6 +116,14 @@ Because the outbox guarantees at-least-once delivery, `notifications-service` ma
 
 **Limits.** Single run per variant, manual stop/start timing, local Docker environment.
 
+## Distributed tracing
+
+All services export OpenTelemetry traces to Jaeger (`http://localhost:16686`). A single `POST /api/orders` is one trace spanning api-gateway, orders-service, users-service and products-service.
+
+![Trace of an order request](docs/jaeger-trace.png)
+
+**Gotcha found along the way:** `UserClient` and `ProductClient` were built with the static `RestClient.builder()`, which skips Spring's instrumentation, so traces stopped at orders-service (1 span). Injecting Spring's `RestClient.Builder` fixed propagation (8 spans, 4 services).
+
 ## What's not (yet) included
 
 - Kubernetes deployment (the platform currently runs via Docker Compose only)

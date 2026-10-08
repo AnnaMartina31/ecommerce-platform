@@ -71,6 +71,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://users-db:5432/users
       SPRING_DATASOURCE_USERNAME: app
       SPRING_DATASOURCE_PASSWORD: app
+      MANAGEMENT_OPENTELEMETRY_TRACING_EXPORT_OTLP_ENDPOINT: http://jaeger:4318/v1/traces
     depends_on:
       - users-db
 
@@ -83,6 +84,7 @@ services:
       SPRING_DATASOURCE_USERNAME: app
       SPRING_DATASOURCE_PASSWORD: app
       SPRING_DATA_REDIS_HOST: redis
+      MANAGEMENT_OPENTELEMETRY_TRACING_EXPORT_OTLP_ENDPOINT: http://jaeger:4318/v1/traces
     depends_on:
       - products-db
       - redis
@@ -98,11 +100,13 @@ services:
       USERS_SERVICE_URL: http://users-service:8080
       PRODUCTS_SERVICE_URL: http://products-service:8081
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      MANAGEMENT_OPENTELEMETRY_TRACING_EXPORT_OTLP_ENDPOINT: http://jaeger:4318/v1/traces
     depends_on:
       - orders-db
       - users-service
       - products-service
       - kafka
+
 
   notifications-db:
     image: postgres:16
@@ -124,6 +128,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://notifications-db:5432/notifications
       SPRING_DATASOURCE_USERNAME: app
       SPRING_DATASOURCE_PASSWORD: app
+      MANAGEMENT_OPENTELEMETRY_TRACING_EXPORT_OTLP_ENDPOINT: http://jaeger:4318/v1/traces
     depends_on:
       - kafka
       - notifications-db
@@ -137,6 +142,8 @@ services:
       - users-service
       - products-service
       - orders-service
+    environment:
+      MANAGEMENT_OPENTELEMETRY_TRACING_EXPORT_OTLP_ENDPOINT: http://jaeger:4318/v1/traces
 
   prometheus:
     image: prom/prometheus:latest
@@ -150,6 +157,15 @@ services:
       - orders-service
       - notifications-service
       - api-gateway
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.62.0
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16686:16686"
+      - "4318:4318"
+
   grafana:
     image: grafana/grafana:latest
     ports:
