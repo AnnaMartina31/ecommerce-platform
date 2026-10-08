@@ -126,10 +126,7 @@ All services export OpenTelemetry traces to Jaeger (`http://localhost:16686`). A
 
 ## What's not (yet) included
 
-- Kubernetes deployment (the platform currently runs via Docker Compose only)
-- Automated test suite (unit/integration tests exist per-service but aren't wired into CI)
-- Distributed tracing (Zipkin/Jaeger)
-- Authentication/authorization on the gateway
+- Idempotency and outbox are verified at integration level only; no end-to-end failure-injection suite beyond the k6 resilience scenario
 
 ## Project structure
 
